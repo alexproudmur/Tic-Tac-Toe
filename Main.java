@@ -1,22 +1,32 @@
 package tictactoe;
-
+// импорт сканнера
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        //создание объекта сканнера
         Scanner scanner = new Scanner(System.in);
-
+        
+        //инициализация массива символов, в котором будут храниться значения игрового поля
         char[] arrA = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        //вывод пустого поля
         printXO(arrA);
+        //инициализация массива игроков
         char[] players = {'X', 'O'};
+        
+        //инициализация вспомогательной переменной k для вычисления очереди хода игроков
         int k = 0;
 
         while (continueFunc(arrA)) {
+            //вызов метода с попыткой сделать ход
             tryEnter(scanner, arrA, players[k]);
+            
+            //при удачном выполнении хода, учитываем, что игрок сделал ход, и передаем очередь другому (Х ходит первым по условию задачи всегда)
             k++;
             k = k % 2;
         }
-
+        
+        //проверка, выиграл ли кто-то или ничья
         if (aWins(arrA, 'X')) {
             System.out.println("X wins");
         } else if (aWins(arrA, 'O')) {
@@ -25,7 +35,8 @@ public class Main {
             System.out.println("Draw");
         }
     }
-
+    
+    //метод с рекурсией, чтобы игрок сделал свой ход, исключениие возникает в том случае, если было введено недоступное значение
     static void tryEnter(Scanner scanner, char[] array, char g) {
         try {
             enterCell(scanner, array, g);
@@ -34,29 +45,38 @@ public class Main {
             tryEnter(scanner, array, g);
         }
     }
-
+    
+    //метод ввода клетки игрового поля, где игрок поставит отметку
     static void enterCell(Scanner scanner, char[] array, char a) {
+        
         System.out.print("Enter the coordinates: ");
         scanner.useDelimiter("\n");
         String str = scanner.next();
-
+        
+        // раздение введенной строки по пробелу в массив строк
         String[] arrString = str.split(" ");
-
+        
+        // если введена строка с всего лиь одной подстрокой, то это неверный аргумент, вызов исключения
         if (arrString.length == 1) {
             throw new IllegalArgumentException("You should enter numbers!");
         } else {
+            // проверка, является ли ввод числами, иначе -- вызов исключения
             if (isNumeric(arrString[0]) && isNumeric(arrString[1])) {
                 int fCoord = Integer.parseInt(arrString[0]);
                 int sCoord = Integer.parseInt(arrString[1]);
-
+                
+                // проверка правильности по диапазону допустимых значений
                 if (fCoord > 3 || sCoord > 3 || fCoord < 1 || sCoord < 1) {
                     throw new IllegalArgumentException("Coordinates should be from 1 to 3!");
                 } else {
+                    //вычисление абсолютной координаты в нашем массиве символов
                     int coord = 3 * (fCoord - 1) + sCoord - 1;
-
+                       
+                    // провека не занята ли эта клетка
                     if (array[coord] != ' ') {
                         throw new IllegalArgumentException("This cell is occupied! Choose another one!");
                     } else {
+                        //заполнение клетки и вывод изменений
                         array[coord] = a;
                         printXO(array);
                     }
@@ -67,7 +87,7 @@ public class Main {
         }
     }
 
-
+    //метод печати игрового поля
     static void printXO(char[] array) {
         System.out.println("\n---------");
         for (int i = 0; i < 3; i++) {
@@ -76,7 +96,7 @@ public class Main {
         System.out.println("---------");
     }
 
-
+    //проверка являетс ли подстрока числом
     public static boolean isNumeric(String str) throws NumberFormatException {
         try {
             Integer.parseInt(str);
@@ -85,11 +105,13 @@ public class Main {
             return false;
         }
     }
-
+    
+    //функция-условие продолжение цикла, возвращает истину если игра не закончена
     static boolean continueFunc(char[] array) {
         return !(aWins(array, 'X') || aWins(array, 'O') || isFilled(array));
     }
 
+    // демоверсия стадии 3
 //    static void general(char[] array) {
 //        if (isImpossible(array)) {
 //            System.out.print("Impossible");
@@ -106,6 +128,7 @@ public class Main {
 //        }
 //    }
 
+    //метод-проверка, заполнено ли поле
     static boolean isFilled(char[] arr) {
         int k = 0;
         for (int i = 0; i < arr.length; i++) {
@@ -115,7 +138,8 @@ public class Main {
         }
         return k == 0;
     }
-
+    
+    //метод-проверка является ли ситуация возможной, в финальной реализации проекта не используется в меру ненадобности
     static boolean isImpossible(char[] arr) {
         int x = 0;
         int o = 0;
@@ -131,7 +155,8 @@ public class Main {
         return Math.abs(x - o) > 1 || (aWins(arr, 'X') && aWins(arr, 'O'));
     }
 
-
+    
+    //метод "выиграл ли", проверяет победил ли определенный игрок
     static boolean aWins(char[] arr, char a) {
         boolean win = false;
 
